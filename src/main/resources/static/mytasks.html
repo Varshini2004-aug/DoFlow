@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Tasks – DoFlow</title>
+
+  <style>
+    /* ---------- merged mytasks.css ---------- */
+    body{
+      margin:0;font-family:"Segoe UI",sans-serif;
+      background:#eaffea url("images/mint-design-3.jpg") no-repeat center/cover;
+      min-height:100vh;display:flex;justify-content:center;align-items:center
+    }
+    .container{background:#ecfeed;padding:2rem;width:95%;max-width:820px;
+      border-radius:20px;box-shadow:0 8px 30px rgba(0,0,0,.12)}
+    .logo{width:60px}
+    header{text-align:center;margin-bottom:1.2rem}
+    /* filters */
+    .filters{display:flex;justify-content:center;gap:10px;margin-bottom:1.4rem}
+    .filters button{padding:10px 16px;border:none;border-radius:8px;background:#57cc99;
+      color:#fff;font-weight:600;cursor:pointer;transition:background .25s}
+    .filters button:hover{background:#38a169}
+    .filters button.active{background:#2f855a}
+    /* task card */
+    .task{border-radius:10px;padding:1rem;margin-bottom:1rem;
+      display:flex;justify-content:space-between;flex-wrap:wrap}
+    .task-info h3{margin:0 0 6px}
+    .task-info p{margin:0;font-size:.9rem;color:#555}
+    .task-actions button{border:none;padding:6px 10px;margin-left:5px;border-radius:6px;
+      cursor:pointer;color:#fff}
+    .task-actions .complete{background:#57cc99}
+    .task-actions .edit{background:#4dabf7}
+    .task-actions .delete{background:#ff6b6b}
+    .task-actions button:hover{opacity:.9}
+    /* footer */
+    .footer{display:flex;justify-content:space-between;align-items:center;margin-top:.8rem}
+    .footer button{background:#57cc99;border:none;padding:8px 16px;border-radius:8px;color:#fff;
+      cursor:pointer}
+    .footer a{color:#008c5f;font-weight:600;text-decoration:none}
+    .footer a:hover{text-decoration:underline}
+    /* toast */
+    #toast{position:fixed;top:20px;right:20px;background:#d4edda;color:#155724;
+      padding:10px 16px;border-radius:6px;display:none;font-weight:600;z-index:999}
+    #toast.error{background:#f8d7da;color:#721c24}
+    
+    body.dark {
+  background: linear-gradient(to right, #2d2d2d, #434343);
+  color: #eaffea;
+}
+
+body.dark .container {
+  background: #2c2c2c;
+  box-shadow: 0 0 20px rgba(144, 238, 144, 0.2);
+  border: 1px solid #444;
+}
+
+body.dark .filters button {
+  background: #00b34d;
+  color: white;
+}
+
+body.dark .filters button.active {
+  background: #009944;
+}
+
+body.dark .task {
+  border: 1px solid #444;
+  color: #244d3b;
+}
+
+body.dark .task-info p {
+  color: #c0c0c0;
+}
+
+body.dark .task-actions button {
+  color: white;
+  border: none;
+}
+
+body.dark .task-actions .complete {
+  background: #00b34d;
+}
+
+body.dark .task-actions .edit {
+  background: #4dabf7;
+}
+
+body.dark .task-actions .delete {
+  background: #ff6b6b;
+}
+
+body.dark .footer button {
+  background: #00b34d;
+  color: white;
+}
+
+body.dark a {
+  color: #90ee90;
+}
+
+body.dark a:hover {
+  text-decoration: underline;
+}
+
+body.dark #toast {
+  background: #d4edda;
+  color: #155724;
+}
+
+body.dark #toast.error {
+  background: #f8d7da;
+  color: #721c24;
+}
+    
+  </style>
+</head>
+
+<body>
+
+
+<script>
+  // Apply saved theme and font size on every page
+  document.addEventListener("DOMContentLoaded", () => {
+    const savedTheme = localStorage.getItem("theme");
+    const savedFontSize = localStorage.getItem("fontSize");
+
+    if (savedTheme === "dark") {
+      document.body.classList.add("dark");
+    }
+
+    if (savedFontSize) {
+      document.body.style.fontSize =
+        savedFontSize === "small" ? "14px" :
+        savedFontSize === "large" ? "18px" :
+        "16px";
+    }
+  });
+</script>
+
+  <div class="container">
+    <header>
+      <a href="home.html"><img src="images/logo.jpg" class="logo" alt="Logo"></a>
+      <h1>My Tasks</h1>
+    </header>
+
+    <div class="filters">
+      <button data-filter="ALL" class="active">All</button>
+      <button data-filter="PENDING">Pending</button>
+      <button data-filter="COMPLETED">Completed</button>
+    </div>
+
+    <section id="taskList"></section>
+
+    <div class="footer">
+      <button id="refreshBtn">↻ Refresh</button>
+      <a href="home.html">← Back to Home</a>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+  
+  
+  
+
+  <script type="module">
+  const BASE_URL = "http://localhost:8080";
+
+  async function request(method, url, data) {
+    const opts = { method, headers: { "Content-Type": "application/json" } };
+    if (data) opts.body = JSON.stringify(data);
+    const res = await fetch(BASE_URL + url, opts);
+    if (!res.ok) throw new Error(await res.text() || res.statusText);
+    return res.status === 204 ? null : res.json();
+  }
+
+  const get = url => request("GET", url);
+  const put = (url, d) => request("PUT", url, d);
+  const del = url => request("DELETE", url);
+
+  const listEl     = document.getElementById("taskList");
+  const filterBtns = document.querySelectorAll(".filters button");
+  const refreshBtn = document.getElementById("refreshBtn");
+  const toast      = document.getElementById("toast");
+
+  let tasks = [];
+  let filter = "ALL";
+  let categories = [];
+
+  document.addEventListener("DOMContentLoaded", loadTasks);
+  refreshBtn.addEventListener("click", loadTasks);
+
+  async function loadTasks() {
+  const userId = localStorage.getItem("userId");
+  if (!userId) {
+    showToast("User not logged in", true, 3000);
+    return;
+  }
+
+  try {
+    const [catData, taskData] = await Promise.all([
+      get("/api/categories"),
+      get(`/api/tasks/user/${userId}`)
+    ]);
+    categories = catData;
+    tasks = taskData;
+    showToast("Tasks loaded", false, 1200);
+  } catch (err) {
+    console.error(err);
+    tasks = [];
+    categories = [];
+    showToast("Could not fetch tasks", true, 3000);
+  }
+
+  render();
+}
+
+
+  filterBtns.forEach(btn => btn.addEventListener("click", () => {
+    filterBtns.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    filter = btn.dataset.filter;
+    render();
+  }));
+
+  function render() {
+  const view = tasks.filter(t => filter === "ALL" || t.status === filter);
+  if (view.length === 0) {
+    listEl.innerHTML = "<p>No tasks to show.</p>";
+    return;
+  }
+
+  listEl.innerHTML = view.map(t => {
+    const category = categories.find(c => c.id === t.categoryId);
+    const bg = category?.colorCode || "#f1f1f1";
+
+    return `
+      <div class="task" data-id="${t.id}" style="background-color: ${bg};">
+        <div class="task-info">
+          <h3>${t.title}</h3>
+          <p>${t.date ?? ""}</p>
+        </div>
+        <div class="task-actions">
+          <button data-id="${t.id}" data-action="toggle">${t.status === "COMPLETED" ? "↺" : "✓"}</button>
+          <button data-id="${t.id}" data-action="edit">✏️</button>
+          <button data-id="${t.id}" data-action="delete">🗑️</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  listEl.querySelectorAll("button").forEach(btn => {
+    const id = Number(btn.dataset.id);
+    const action = btn.dataset.action;
+    if (action === "toggle")  btn.addEventListener("click", () => toggleStatus(id));
+    if (action === "edit")    btn.addEventListener("click", () => editTask(id));
+    if (action === "delete")  btn.addEventListener("click", () => deleteTask(id));
+  });
+}
+
+
+  async function toggleStatus(id) {
+    const task = tasks.find(t => t.id === id);
+    task.status = task.status === "COMPLETED" ? "PENDING" : "COMPLETED";
+    await put(`/api/tasks/${id}`, task).then(() => showToast("Status updated"));
+    render();
+  }
+
+  async function editTask(id) {
+    const task = tasks.find(t => t.id === id);
+    const newTitle = prompt("Edit title:", task.title);
+    if (!newTitle) return;
+    task.title = newTitle.trim();
+    await put(`/api/tasks/${id}`, task).then(() => showToast("Task updated"));
+    render();
+  }
+
+  async function deleteTask(id) {
+    if (!confirm("Delete this task?")) return;
+    await del(`/api/tasks/${id}`).then(() => showToast("Task deleted"));
+    tasks = tasks.filter(t => t.id !== id);
+    render();
+  }
+
+  function showToast(msg, error = false, ms = 2000) {
+    toast.textContent = msg;
+    toast.classList.toggle("error", error);
+    toast.style.display = "block";
+    toast.style.opacity = "1";
+    setTimeout(() => toast.style.opacity = "0", ms);
+  }
+</script>
+
+</body>
+</html>

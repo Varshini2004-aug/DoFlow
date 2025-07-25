@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contact Us – DoFlow</title>
+
+  <style>
+    /* ------------ Base layout ------------ */
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+      background:#eaffea url("img/mint-design-3.jpg") no-repeat center/cover;
+      min-height:100vh;
+      display:flex;justify-content:center;align-items:center;
+      flex-direction:column
+    }
+    .logo-link{position:absolute;top:20px;left:20px}
+    .mini-logo{height:48px;border-radius:6px;transition:transform .25s}
+    .mini-logo:hover{transform:scale(1.06)}
+
+    /* ------------ Contact card ------------ */
+    .contact-container{
+      background:#ecfeed;
+      padding:2rem 2.5rem;
+      border-radius:20px;
+      max-width:420px;width:90%;text-align:center;
+      box-shadow:0 8px 25px rgba(0,0,0,.12)
+    }
+    h2{margin-top:0;font-size:1.9rem;color:#2b7a2b}
+    form input,form textarea,form button{
+      width:100%;margin-bottom:1rem;padding:.8rem;font-size:1rem;border-radius:10px;border:1px solid #ccc
+    }
+    form textarea{resize:vertical;min-height:100px}
+    form button{
+      background:#57cc99;color:#fff;border:none;font-weight:600;cursor:pointer;transition:background .25s
+    }
+    form button:hover{background:#38a169}
+
+    /* ------------ Popup ------------ */
+    #contactMsg{
+      display:none;margin-top:10px;padding:10px;border-radius:6px;font-weight:600;
+      background:#d4edda;color:#155724
+    }
+    #contactMsg.error{background:#f8d7da;color:#721c24}
+    
+    body.dark {
+  background: linear-gradient(to right, #2d2d2d, #434343);
+  color: #e3ffe5;
+}
+
+/* Logo hover in dark */
+body.dark .mini-logo:hover {
+  transform: scale(1.06);
+}
+
+/* Contact card background and text */
+body.dark .contact-container {
+  background-color: #2b2b2b;
+  color: #e3ffe5;
+  border: 1px solid #444;
+  box-shadow: 0 0 12px rgba(144, 238, 144, 0.2);
+}
+
+/* Headline */
+body.dark h2 {
+  color: #90ee90;
+}
+
+/* Form fields */
+body.dark form input,
+body.dark form textarea {
+  background-color: #444;
+  color: #e3ffe5;
+  border: 1px solid #666;
+}
+
+body.dark form input::placeholder,
+body.dark form textarea::placeholder {
+  color: #bbbbbb;
+}
+
+/* Submit button */
+body.dark form button {
+  background: #00b36b;
+  color: #fff;
+}
+
+body.dark form button:hover {
+  background: #009944;
+}
+
+/* Popup messages */
+body.dark #contactMsg {
+  background: #c9f7d3;
+  color: #155724;
+}
+
+body.dark #contactMsg.error {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+  </style>
+</head>
+<body>
+
+<script>
+  // Apply saved theme and font size on every page
+  document.addEventListener("DOMContentLoaded", () => {
+    const savedTheme = localStorage.getItem("theme");
+    const savedFontSize = localStorage.getItem("fontSize");
+
+    if (savedTheme === "dark") {
+      document.body.classList.add("dark");
+    }
+
+    if (savedFontSize) {
+      document.body.style.fontSize =
+        savedFontSize === "small" ? "14px" :
+        savedFontSize === "large" ? "18px" :
+        "16px";
+    }
+  });
+</script>
+
+  <a class="logo-link" href="home.html">
+    <img src="images/logo.jpg" class="mini-logo" alt="Logo" />
+  </a>
+
+  <div class="contact-container">
+    <h2>Contact Us</h2>
+    <form id="contactForm">
+      <input  name="name"  placeholder="Your Name"  required />
+      <input  name="email" type="email" placeholder="Your Email" required />
+      <textarea name="msg" rows="3" placeholder="Your Message" required></textarea>
+      <button type="submit">Send Message</button>
+    </form>
+    <button id="backBtn" type="button" style="margin-top: 10px;">⬅️ Back to Homepage</button>
+    
+    <div id="contactMsg" class="popup">✅ Message sent!</div>
+  </div>
+
+  <script type="module">
+  async function post(url, data){
+    const res = await fetch(`/api/${url}`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return res.text();  // Use text() because your Java backend returns plain string
+  }
+
+  const form = document.getElementById("contactForm");
+  const pop  = document.getElementById("contactMsg");
+
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(form));
+    try {
+      await post("contact", data);
+      pop.textContent = "✅ Message sent!";
+      pop.classList.remove("error");
+      pop.style.display = "block";
+      form.reset();
+      setTimeout(() => pop.style.display = "none", 3000);
+    } catch (err) {
+      console.error(err);
+      pop.textContent = "❌ Could not send. Try again.";
+      pop.classList.add("error");
+      pop.style.display = "block";
+    }
+  });
+
+document.getElementById("backBtn").addEventListener("click", () => {
+  window.location.href = "Homepage.html";
+});
+
+</script>
+
+  
+  
+</body>
+</html>

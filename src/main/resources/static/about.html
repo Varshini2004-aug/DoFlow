@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About – Online To‑Do List</title>
+
+  <!-- ↓↓↓ merged CSS ↓↓↓ -->
+  <style>
+    /* ---------------- Core look & feel ---------------- */
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #eaffea url('img/mint-design-3.jpg') no-repeat center / cover;
+      color: #111;
+    }
+
+    /* ---------- Card container ---------- */
+    .container {
+      max-width: 800px;
+      margin: 60px auto;
+      padding: 30px 40px;
+      background-color: #ecfeed;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.15);
+      text-align: center;
+    }
+
+    /* ---------- Typography ---------- */
+    .title       { font-size: 2.25rem; margin-bottom: .6em; }
+    .description { font-size: 1.1rem;  line-height: 1.6;    margin-bottom: 2em; }
+
+    .features h2 { color: #000;  margin-bottom: .3em; }
+    .features ul { list-style: square; padding-left: 2.4rem; text-align: left; }
+    .features li { margin: .55em 0; font-size: 1rem; }
+
+    /* ---------- Button ---------- */
+    button {
+      margin-top: 30px;
+      padding: 12px 28px;
+      background: #00ff55;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .25s;
+    }
+    button:hover { background: #00cc44; }
+
+    #extraMessage { margin-top: 20px; font-style: italic; }
+
+    /* ---------- Mini header ---------- */
+    .mini-header {
+      background: #ecfeed;
+      padding: 10px 20px;
+      display: flex; align-items: center;
+      border-bottom: 1px solid #ccc;
+    }
+    .mini-logo {
+      height: 40px; cursor: pointer;
+      transition: transform .25s;
+    }
+    .mini-logo:hover { transform: scale(1.06); }
+
+    /* ---------- Footer ---------- */
+    .footer { margin-top: 40px; }
+    .footer a { color: #111; text-decoration: none; font-weight: 600; }
+    .footer a:hover { text-decoration: underline; }
+
+    /* ---------------- Responsive tweaks ---------------- */
+    @media (max-width: 768px) {
+      .container       { padding: 24px; margin: 40px 16px; }
+      .title           { font-size: 1.75rem; }
+      .description     { font-size: 1rem; }
+      .features li     { font-size: .95rem; }
+      button           { font-size: .95rem; }
+    }
+
+    @media (max-width: 480px) {
+      .container       { padding: 16px; margin: 32px 12px; }
+      .title           { font-size: 1.5rem; }
+      .description     { font-size: .9rem; }
+      .features li     { font-size: .9rem; }
+      button           { font-size: .9rem; padding: 10px 20px; }
+    }
+    
+    body.dark {
+  background: linear-gradient(to right, #2d2d2d, #434343);
+  color: #e3ffe5;
+}
+
+/* Card Container */
+body.dark .container {
+  background-color: #2b2b2b;
+  color: #e3ffe5;
+  border: 1px solid #444;
+  box-shadow: 0 0 12px rgba(144, 238, 144, 0.15);
+}
+
+/* Mini Header */
+body.dark .mini-header {
+  background-color: #2c2c2c;
+  border-bottom: 1px solid #444;
+}
+
+/* Text Elements */
+body.dark .title,
+body.dark .description,
+body.dark h2,
+body.dark h1,
+body.dark p,
+body.dark li {
+  color: #b4ffb4;
+}
+
+/* Button */
+body.dark button {
+  background-color: #00b34d;
+  color: #ffffff;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+body.dark button:hover {
+  background-color: #009944;
+}
+
+/* Footer Links */
+body.dark .footer a {
+  color: #90ee90;
+}
+
+body.dark .footer a:hover {
+  text-decoration: underline;
+  color: #baffc9;
+}
+
+    
+  </style>
+</head>
+
+<body>
+
+
+<script>
+  // Apply saved theme and font size on every page
+  document.addEventListener("DOMContentLoaded", () => {
+    const savedTheme = localStorage.getItem("theme");
+    const savedFontSize = localStorage.getItem("fontSize");
+
+    if (savedTheme === "dark") {
+      document.body.classList.add("dark");
+    }
+
+    if (savedFontSize) {
+      document.body.style.fontSize =
+        savedFontSize === "small" ? "14px" :
+        savedFontSize === "large" ? "18px" :
+        "16px";
+    }
+  });
+</script>
+
+
+
+  <!-- ▸ Mini header with logo -->
+  <header class="mini-header">
+    <a href="home.html">
+      <img src="img/logo.jpg" class="mini-logo" alt="Logo">
+    </a>
+  </header>
+
+  <main class="container">
+    <h1 class="title">About This To‑Do List App</h1>
+    <p class="description">
+      Our Online To‑Do List is a simple, smart and powerful task manager built
+      for productivity. Whether you're a student, professional or home planner,
+      this app helps you stay focused and never miss a deadline.
+    </p>
+
+    <!-- ▸ Features -->
+    <section class="features">
+      <h2>🌟 Key Features</h2>
+      <ul>
+        <li>Create, update and delete tasks</li>
+        <li>Set due‑dates, reminders and priorities</li>
+        <li>Monthly planning with a calendar view</li>
+        <li>Clean, modern UI – light & dark themes</li>
+        <li>Works offline with <code>localStorage</code></li>
+        <li>100 % responsive and mobile‑friendly</li>
+      </ul>
+    </section>
+
+    <button id="learnMoreBtn">Learn More</button>
+    <p id="extraMessage"></p>
+
+    <!-- ▸ Team / project blurb -->
+    <section class="about-us">
+      <h1>About Us</h1>
+      <p>
+        We’re a small team of developers who believe in building
+        <span class="highlight">simple</span>, <span class="highlight">effective</span>
+        web apps that make everyday life easier. This project is part of a
+        continuous learning journey in full‑stack development – and we’re glad
+        you’re here 🌱
+      </p>
+    </section>
+
+    <footer class="footer">
+      <a href="home.html">← Back to Home</a>
+    </footer>
+  </main>
+
+  <!-- ↓↓↓ merged JS ↓↓↓ -->
+  <script>
+    /* ---------- UI helpers ---------- */
+    const btn   = document.getElementById('learnMoreBtn');
+    const extra = document.getElementById('extraMessage');
+
+    btn.addEventListener('click', () => {
+      extra.textContent =
+        'This app is part of a personal productivity suite. ' +
+        'Upcoming releases will add task‑sharing and multi‑device sync!';
+    });
+
+    /* ---------- API helpers (global functions) ---------- */
+
+    async function registerUser(username, password) {
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        alert(await res.text());
+      } catch (err) {
+        console.error('Registration failed:', err);
+      }
+    }
+
+    async function fetchTasks() {
+      const res = await fetch('/api/tasks');
+      return res.json();
+    }
+
+    async function createTask(task) {
+      const res = await fetch('/api/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(task)
+      });
+      return res.json();
+    }
+
+    async function updateTask(id, task) {
+      const res = await fetch(`/api/tasks/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(task)
+      });
+      return res.json();
+    }
+
+    async function deleteTask(id) {
+      await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
+    }
+
+    /* The helpers above are now global: call e.g. createTask({ ... }) from console */
+  </script>
+</body>
+</html>

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome Back - To-Do List</title>
+  <link rel="stylesheet" href="loggedin.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5fff6;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      background-color: #ecfeed;
+    }
+
+    .branding {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo {
+      height: 40px;
+      margin-right: 10px;
+    }
+
+    .title {
+      font-size: 26px;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .profile-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .profile-pic {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #4e9a52;
+    }
+
+    .greeting {
+      font-size: 16px;
+      color: #333;
+      font-weight: bold;
+    }
+
+    .main-content {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .main-content h2 {
+      color: #2b7a2b;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .main-content p {
+      font-size: 16px;
+      color: #555;
+      max-width: 600px;
+      margin: 0 auto 30px;
+    }
+
+    .nav-btns {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btns a {
+      background-color: #ecfeed;
+      color: black;
+      padding: 12px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.3s;
+    }
+
+    .nav-btns a:hover {
+      background-color: #4e9a52;
+      color: white;
+    }
+
+    footer {
+      background-color: #ccf1cf;
+      text-align: center;
+      padding: 20px 10px;
+      font-size: 14px;
+      color: #333;
+      margin-top: 50px;
+    }
+
+    @media (max-width: 768px) {
+      .title {
+        font-size: 22px;
+      }
+
+      .greeting {
+        font-size: 14px;
+      }
+
+      .nav-btns a {
+        font-size: 14px;
+        padding: 10px 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .title {
+        font-size: 18px;
+      }
+
+      .greeting {
+        font-size: 13px;
+      }
+
+      .main-content h2 {
+        font-size: 22px;
+      }
+
+      .main-content p {
+        font-size: 14px;
+      }
+    }
+
+    .dark body {
+      background: linear-gradient(to right, #1e1e1e, #2c2c2c);
+      color: #eaffea;
+    }
+
+    .dark .container,
+    .dark .calendar,
+    .dark .task-display,
+    .dark .box,
+    .dark .settings-container {
+      background-color: #2b2b2b;
+      color: #eaffea;
+      border: 1px solid #444;
+      box-shadow: 0 0 10px rgba(144, 238, 144, 0.2);
+    }
+
+    .dark .title,
+    .dark .description,
+    .dark h2,
+    .dark label,
+    .dark .features li {
+      color: #b4ffb4;
+    }
+
+    .dark input,
+    .dark textarea,
+    .dark select {
+      background-color: #3a3a3a;
+      color: #eaffea;
+      border: 1px solid #555;
+    }
+
+    .dark button {
+      background-color: #00b34d;
+      color: #fff;
+    }
+
+    .dark button:hover {
+      background-color: #009944;
+    }
+
+    .dark a {
+      color: #90ee90;
+    }
+
+    .dark a:hover {
+      text-decoration: underline;
+    }
+    
+    
+    body.dark {
+  background: linear-gradient(to right, #2d2d2d, #434343);
+  color: #e3ffe5;
+}
+
+/* Header section */
+body.dark header {
+  background-color: #1f1f1f;
+  border-bottom: 1px solid #333;
+}
+
+body.dark .greeting {
+  color: #b4ffb4;
+}
+
+body.dark .profile-pic {
+  border-color: #90ee90;
+}
+
+/* Buttons section */
+body.dark .nav-btns a {
+  background-color: #2c2c2c;
+  color: #e3ffe5;
+  border: 1px solid #444;
+}
+
+body.dark .nav-btns a:hover {
+  background-color: #00b36b;
+  color: white;
+}
+
+/* Main text content */
+body.dark .main-content h2 {
+  color: #90ee90;
+}
+
+body.dark .main-content p {
+  color: #ccc;
+}
+
+/* Footer */
+body.dark footer {
+  background-color: #1c1c1c;
+  color: #cccccc;
+}
+
+/* Branding title */
+body.dark .title {
+  color: #b4ffb4;
+}
+
+/* Profile menu & other labels */
+body.dark label {
+  color: #b4ffb4;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+
+    
+  </style>
+</head>
+<body>
+
+
+<script>
+  // Apply saved theme and font size on every page
+  document.addEventListener("DOMContentLoaded", () => {
+    const savedTheme = localStorage.getItem("theme");
+    const savedFontSize = localStorage.getItem("fontSize");
+
+    if (savedTheme === "dark") {
+      document.body.classList.add("dark");
+    }
+
+    if (savedFontSize) {
+      document.body.style.fontSize =
+        savedFontSize === "small" ? "14px" :
+        savedFontSize === "large" ? "18px" :
+        "16px";
+    }
+  });
+</script>
+
+  <header>
+    <div class="branding">
+      <img src="images/logo.jpg" alt="Logo" class="logo" />
+      <h1 class="title">DoFlow</h1>
+    </div>
+    <div class="profile-info">
+      <span class="greeting">Hi, <span id="username"></span>!</span>
+      <a href="profile.html">
+        <img id="profile-pic" src="default-profile.jpg" alt="O" class="profile-pic" />
+      </a>
+    </div>
+  </header>
+  
+  
+  
+
+  <main class="main-content">
+    <h2>Welcome Back!</h2>
+    <p>Plan your tasks, stay organized, and boost productivity with ease.</p>
+    <div class="nav-btns">
+      <a href="mytasks.html">My Tasks</a>
+      <a href="addtask.html">Add Task</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="settings.html">Settings</a>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 To-Do List App. All rights reserved.</p>
+  </footer>
+  
+  <script>
+/* =====  Config & handles  ===== */
+const BASE         = "http://localhost:8080/api";
+const usernameEl   = document.getElementById("username");
+const profilePicEl = document.getElementById("profile-pic");
+
+/* =====  1. Instant paint from cache  ===== */
+function paintFromStorage() {
+  const name  = localStorage.getItem("name");
+  const img64 = localStorage.getItem("profileImage");
+  usernameEl.textContent = name  || "User";
+  profilePicEl.src       = img64 || "default-user.png";
+}
+paintFromStorage();
+
+/* =====  2. Live-sync across tabs  ===== */
+window.addEventListener("storage", e => {
+  if (e.key === "name")         usernameEl.textContent = e.newValue || "User";
+  if (e.key === "profileImage") profilePicEl.src       = e.newValue || "default-user.png";
+});
+
+/* =====  3. Fresh pull from backend  ===== */
+(async () => {
+  const userId = localStorage.getItem("userId");
+  if (!userId) return;
+  try {
+    const res  = await fetch(`${BASE}/users/${userId}`);
+    if (!res.ok) throw new Error(res.status);
+    const user = await res.json();
+
+    usernameEl.textContent = user.username ?? "User";
+    profilePicEl.src       = user.profilePictureUrl || "default-user.png";
+
+    localStorage.setItem("name",        user.username);
+    if (user.profilePictureUrl)
+      localStorage.setItem("profileImage", user.profilePictureUrl);
+  } catch (err) {
+    console.warn("Could not refresh profile:", err);
+  }
+})();
+</script>
+  
+</body>
+</html>

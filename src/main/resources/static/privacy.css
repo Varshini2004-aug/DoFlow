@@ -1,0 +1,74 @@
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #eaffea;
+  color: #333;
+  padding: 0 20px;
+}
+
+/* Logo link */
+.logo-link {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: inline-block;
+}
+.mini-logo {
+  height: 40px;
+  width: auto;
+  cursor: pointer;
+}
+
+/* Main container */
+.privacy-container {
+  max-width: 900px;
+  margin: 60px auto 30px;
+  background: #fff;
+  padding: 30px 40px;
+  border-radius: 15px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.privacy-container h1 {
+  text-align: center;
+  color: #2b6e2f;
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+
+.privacy-container h2 {
+  color: #4eb44e;
+  font-size: 1.3em;
+  margin-top: 25px;
+}
+
+.privacy-container p {
+  font-size: 1.05em;
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .privacy-container {
+    padding: 20px;
+  }
+
+  .privacy-container h1 {
+    font-size: 1.6em;
+  }
+
+  .privacy-container h2 {
+    font-size: 1.15em;
+  }
+
+  .privacy-container p {
+    font-size: 0.95em;
+  }
+}

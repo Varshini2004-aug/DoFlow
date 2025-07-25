@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Statistics</title>
+  <script>
+  if (localStorage.getItem("theme") === "dark") {
+    document.documentElement.classList.add("dark");
+  }
+</script>
+
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background-color: #f5f7fa;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    .feature-box {
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #e3eaf1;
+      width: 200px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .feature-box:hover {
+      background-color: #d0d8e2;
+    }
+    
+    /* 🌙 Dark Mode Styling */
+body.dark {
+  background: linear-gradient(to right, #1b1e20, #2c3c44);
+  color: #eaffea;
+}
+
+body.dark h1 {
+  color: #eaffea;
+}
+
+body.dark .feature-box {
+  background-color: #35424b;
+  color: #eaffea;
+  border: 1px solid #6b8d97;
+}
+
+body.dark .feature-box:hover {
+  background-color: #465863;
+}
+    
+  </style>
+</head>
+<body>
+
+<script>
+  // Apply saved theme and font size on every page
+  document.addEventListener("DOMContentLoaded", () => {
+    const savedTheme = localStorage.getItem("theme");
+    const savedFontSize = localStorage.getItem("fontSize");
+
+    if (savedTheme === "dark") {
+      document.body.classList.add("dark");
+    }
+
+    if (savedFontSize) {
+      document.body.style.fontSize =
+        savedFontSize === "small" ? "14px" :
+        savedFontSize === "large" ? "18px" :
+        "16px";
+    }
+  });
+</script>
+
+  <h1>Statistics</h1>
+  <div class="feature-box" onclick="goToFeature('task-count')">📊 Task Count</div>
+  <div class="feature-box" onclick="goToFeature('completed-tasks')">✅ Completed Tasks</div>
+  <div class="feature-box" onclick="goToFeature('pending-tasks')">⏳ Pending Tasks</div>
+
+  <script>
+    function goToFeature(feature) {
+      window.location.href = `feature.html?feature=${feature}`;
+    }
+  </script>
+  
+  
+</body>
+</html>

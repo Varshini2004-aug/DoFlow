@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Task – Online To‑Do List</title>
+
+  <style>
+    /* ---- core layout ---- */
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: #eaffea url("images/img/mint-design-3.jpg") no-repeat center / cover;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      background: #ecfeed;
+      padding: 2rem;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+      box-shadow: 0 8px 30px rgba(0,0,0,.15);
+    }
+
+    .logo       { width: 80px; margin-bottom: .6rem; }
+    header h1   { margin: .3rem 0 1.2rem; font-size: 1.9rem; color: #333; }
+
+    form input,
+    form textarea,
+    form select,
+    form button {
+      width: 85%;
+      margin-bottom: 1rem;
+      padding: .8rem;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    form textarea { resize: vertical; min-height: 90px; }
+
+    form button {
+      background: #57cc99;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: background .25s;
+    }
+
+    form button:hover { background: #38a169; }
+
+    #taskMsg { font-style: italic; margin-top: .5rem; }
+
+    footer a {
+      color: #008c5f;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    footer a:hover { text-decoration: underline; }
+
+    @media(max-width:480px){
+      header h1 { font-size: 1.6rem; }
+      form button { font-size: .95rem; }
+    }
+    
+    body.dark {
+  background: linear-gradient(to right, #2d2d2d, #434343);
+  color: #e3ffe5;
+}
+
+/* Container in Dark Mode */
+body.dark .container {
+  background-color: #2b2b2b;
+  color: #e3ffe5;
+  border: 1px solid #444;
+  box-shadow: 0 0 12px rgba(144, 238, 144, 0.15);
+}
+
+/* Headings and Labels */
+body.dark header h1 {
+  color: #b4ffb4;
+}
+
+/* Inputs, Textarea, Select */
+body.dark input,
+body.dark textarea,
+body.dark select {
+  background-color: #3a3a3a;
+  color: #e3ffe5;
+  border: 1px solid #555;
+}
+
+body.dark input::placeholder,
+body.dark textarea::placeholder {
+  color: #b4ffb4;
+}
+
+/* Button */
+body.dark form button {
+  background-color: #00b34d;
+  color: #ffffff;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+body.dark form button:hover {
+  background-color: #009944;
+}
+
+/* Footer Links */
+body.dark footer a {
+  color: #90ee90;
+}
+
+body.dark footer a:hover {
+  color: #baffc9;
+  text-decoration: underline;
+}
+
+  </style>
+</head>
+<body>
+
+
+<script>
+  // Apply saved theme and font size on every page
+  document.addEventListener("DOMContentLoaded", () => {
+    const savedTheme = localStorage.getItem("theme");
+    const savedFontSize = localStorage.getItem("fontSize");
+
+    if (savedTheme === "dark") {
+      document.body.classList.add("dark");
+    }
+
+    if (savedFontSize) {
+      document.body.style.fontSize =
+        savedFontSize === "small" ? "14px" :
+        savedFontSize === "large" ? "18px" :
+        "16px";
+    }
+  });
+</script>
+
+  <div class="container">
+    <header>
+      <a href="home.html"><img src="images/logo.jpg" class="logo" alt="Logo"></a>
+      <h1>Add Task</h1>
+    </header>
+
+    <form id="taskForm">
+      <input id="title" placeholder="Title" required />
+      <textarea id="description" placeholder="Description"></textarea>
+      <input id="date" type="date" required />
+      <select id="category" required>
+        <option value="" disabled selected>Select category</option>
+        <option>Work</option>
+        <option>Personal</option>
+        <option>Health</option>
+        <option>Other</option>
+      </select>
+      <button type="submit">Add Task</button>
+    </form>
+
+    <p id="taskMsg"></p>
+
+    <footer>
+      <a href="mytasks.html">View Tasks</a> |
+      <a href="home.html">Back to Home</a>
+    </footer>
+  </div>
+
+  <script>
+  const form   = document.getElementById("taskForm");
+  const msgBox = document.getElementById("taskMsg");
+
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+
+    const userId = localStorage.getItem("userId"); // Make sure this is set during login
+
+    if (!userId) {
+      msgBox.textContent = "User not logged in.";
+      return;
+    }
+
+    const task = {
+      title       : form.title.value.trim(),
+      description : form.description.value.trim(),
+      date        : form.date.value,
+      category    : form.category.value,
+      status      : "PENDING"
+    };
+
+    if (!task.title || !task.date || !task.category) {
+      msgBox.textContent = "Please fill in every required field.";
+      return;
+    }
+
+    try {
+      const res = await fetch(`http://localhost:8080/api/tasks?userId=${userId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(task)
+      });
+
+      if (!res.ok) throw new Error("Server error");
+
+      const saved = await res.json();
+      msgBox.textContent = `✅ Task saved – ID: ${saved.id}`;
+      form.reset();
+    } catch (err) {
+      console.error(err);
+      msgBox.textContent = "❌ Could not save task – see console.";
+    }
+  });
+</script>
+
+  
+  
+</body>
+</html>

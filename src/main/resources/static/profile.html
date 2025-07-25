@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Profile – DoFlow</title>
+  <style>
+    :root{--green:#28a745;--green-dark:#1c7c30;--bg-light:#ecfeed;--bg-dark:#2c2c2cbb;
+      --text-dark:#000;--text-light:#fff;}
+    body{font-family:"Segoe UI",sans-serif;margin:0;padding:0;
+         background:url("./mint-design-3.jpg") no-repeat center/cover;
+         transition:background-color .3s;}
+    .profile-container{max-width:500px;margin:50px auto;padding:30px;
+      background:var(--bg-light);border-radius:15px;
+      box-shadow:0 10px 25px rgba(0,0,0,.15);text-align:center;
+      transition:transform .3s ease;}
+    .profile-container:hover{transform:scale(1.02);}
+    .header{display:flex;justify-content:space-between;align-items:center;}
+    .theme-btn{background:none;border:none;font-size:22px;cursor:pointer;}
+    .profile-pic{width:100px;height:100px;border-radius:50%;
+      border:3px solid var(--green);object-fit:cover;}
+    input[type="file"]{margin-top:10px;}
+    .profile-info input{width:90%;padding:10px;margin:10px 0;
+      border-radius:8px;border:1px solid #ccc;}
+    button{padding:10px 20px;background:var(--green);color:var(--text-light);
+      border:none;border-radius:8px;cursor:pointer;margin-top:10px;
+      transition:background .2s;}
+    button:hover{background:var(--green-dark);}
+    .stats{margin-top:25px;}
+    .progress-bar{width:100%;background:#ddd;border-radius:10px;overflow:hidden;
+      height:20px;margin-top:10px;}
+    #progress{height:100%;width:0%;background:var(--green);transition:width .5s;}
+    .extra-info{margin-top:25px;font-size:15px;}
+    .footer-bar{display:flex;justify-content:space-between;align-items:center;
+      padding:10px 20px;}
+    .logout-btn{padding:8px 16px;background:red;margin-top:30px;}
+    
+    
+    /* 🌙 Dark mode support */
+body.dark {
+  background: linear-gradient(to right, #1c2d23, #2e4639); /* deep green hues */
+  color: #eaffea;
+}
+
+body.dark .profile-container {
+  background: #2f4a3e;
+  color: #eaffea;
+  box-shadow: 0 0 20px rgba(144, 238, 144, 0.3);
+}
+
+body.dark input[type="file"],
+body.dark .profile-info input {
+  background-color: #3e5b4e;
+  color: #eaffea;
+  border: 1px solid #6dc28b;
+}
+
+body.dark button {
+  background-color: #47a96f;
+  color: white;
+}
+
+body.dark button:hover {
+  background-color: #2e804f;
+}
+
+body.dark .progress-bar {
+  background-color: #3d5246;
+}
+
+body.dark #progress {
+  background-color: #57cc99;
+}
+
+body.dark a {
+  color: #90ee90;
+}
+
+body.dark a:hover {
+  text-decoration: underline;
+}
+    
+  </style>
+</head>
+<body>
+
+<script>
+  // Apply saved theme and font size on every page
+  document.addEventListener("DOMContentLoaded", () => {
+    const savedTheme = localStorage.getItem("theme");
+    const savedFontSize = localStorage.getItem("fontSize");
+
+    if (savedTheme === "dark") {
+      document.body.classList.add("dark");
+    }
+
+    if (savedFontSize) {
+      document.body.style.fontSize =
+        savedFontSize === "small" ? "14px" :
+        savedFontSize === "large" ? "18px" :
+        "16px";
+    }
+  });
+</script>
+
+
+  <div class="profile-container">
+    <div class="header">
+      <h2>👤 My Profile</h2>
+      
+    </div>
+
+    <div class="image-upload">
+      <img id="profileImage" class="profile-pic" src="default-user.png" />
+      <input id="upload" type="file" onchange="uploadImage()" />
+    </div>
+
+    <div class="profile-info">
+      <input id="profName" placeholder="Username" />
+      <input id="profPass" placeholder="Password" type="password" />
+      <button onclick="saveProfile()">💾 Save Profile</button>
+      <p id="profMsg"></p>
+    </div>
+
+    <div class="stats">
+      <h3>📊 Task Summary</h3>
+      <p>Total Tasks: <span id="totalTasks">0</span></p>
+      <p>Completed Tasks: <span id="completedTasks">0</span></p>
+      <p>Pending Tasks: <span id="pendingTasks">0</span></p>
+      <div class="progress-bar"><div id="progress"></div></div>
+    </div>
+
+    <div class="extra-info">
+      <p>🕒 Last Login: <span id="lastLogin">--</span></p>
+      <p>📆 Account Created: <span id="createdOn">--</span></p>
+      <p>⏱ Time on Page: <span id="sessionTime">0</span> seconds</p>
+    </div>
+
+    <div class="footer-bar">
+      <a href="home.html">← Back to Home</a>
+      <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+    </div>
+  </div>
+
+ <script>
+  const BASE = "http://localhost:8080/api";
+  const api = {
+    get: (p) => fetch(`${BASE}/${p}`).then(r => r.ok ? r.json() : Promise.reject(r)),
+    put: (p, id, d) => fetch(`${BASE}/${p}/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(d)
+    }).then(r => r.json())
+  };
+
+  const userId = localStorage.getItem("userId");
+  const imgEl = document.getElementById("profileImage");
+
+  async function loadProfile() {
+    try {
+      if (userId) {
+        const user = await api.get(`users/${userId}`);
+        profName.value = user.username ?? "";
+        if (user.profilePictureUrl) imgEl.src = user.profilePictureUrl;
+
+        localStorage.setItem("name", user.username);
+        if (user.profilePictureUrl) localStorage.setItem("profileImage", user.profilePictureUrl);
+
+        createdOn.textContent = user.createdOn ?? "--";
+        lastLogin.textContent = user.lastLogin ?? new Date().toLocaleString();
+        localStorage.setItem("createdOn", createdOn.textContent);
+        localStorage.setItem("lastLogin", lastLogin.textContent);
+
+        const tasks = await api.get(`tasks/user/${userId}`);
+        const total = tasks.length;
+        const done = tasks.filter(t => t.status === "Completed").length;
+        totalTasks.textContent = total;
+        completedTasks.textContent = done;
+        pendingTasks.textContent = total - done;
+        progress.style.width = total ? `${Math.floor(done / total * 100)}%` : "0%";
+      }
+    } catch (e) {
+      console.warn("Offline – using cache:", e);
+      profName.value = localStorage.getItem("name") || "";
+      imgEl.src = localStorage.getItem("profileImage") || "default-user.png";
+      createdOn.textContent = localStorage.getItem("createdOn") || "--";
+      lastLogin.textContent = localStorage.getItem("lastLogin") || "--";
+    }
+  }
+
+  async function saveProfile() {
+    if (!userId) return alert("No userId in localStorage");
+    const payload = {
+      username: profName.value,
+      password: profPass.value,
+      profilePictureUrl: imgEl.src // always send (data-URI or file URL)
+    };
+    try {
+      await api.put("users", userId, payload);
+      profMsg.textContent = "✅ Profile updated!";
+      localStorage.setItem("name", payload.username);
+      localStorage.setItem("profileImage", payload.profilePictureUrl);
+    } catch (e) {
+      profMsg.textContent = "❌ " + (e.status || "Update failed");
+    }
+  }
+
+  async function uploadImage() {
+    const file = upload.files[0];
+    if (!file || !userId) return alert("Select a file and ensure you're logged in.");
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch(`${BASE}/users/${userId}/picture`, {
+        method: "POST",
+        body: formData
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+      const user = await res.json();
+
+      // Update image preview with actual saved path
+      imgEl.src = user.profilePictureUrl;
+      localStorage.setItem("profileImage", user.profilePictureUrl);
+      profMsg.textContent = "✅ Picture updated!";
+    } catch (err) {
+      console.error(err);
+      profMsg.textContent = "❌ Upload failed";
+    }
+  }
+
+  
+
+  function startSessionTimer() {
+    let s = 0;
+    setInterval(() => sessionTime.textContent = ++s, 1000);
+  }
+
+  function logout() {
+    localStorage.clear();
+    alert("Logged out!");
+    location.href = "Homepage.html";
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    loadProfile();
+    startSessionTimer();
+  });
+</script>
+
+</body>
+</html>

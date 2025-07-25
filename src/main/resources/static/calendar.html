@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task Calendar – Online To‑Do List</title>
+
+  <style>
+    /* ------------ Layout & look ------------ */
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: #eaffea url("img/mint-design-3.jpg") no-repeat center / cover;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      background: #eaffea;
+      padding: 2rem;
+      width: 90%;
+      max-width: 540px;
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.12);
+    }
+
+    header { text-align: center; margin-bottom: .8rem; }
+    header h1 { margin: 0; }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin: 1rem 0 1.4rem;
+    }
+    .controls span { font-weight: 600; font-size: 1.2rem; }
+
+    /* ------------ calendar grid ------------ */
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      margin-bottom: 1.8rem;
+    }
+
+    .calendar div {
+      padding: .9rem .4rem;
+      text-align: center;
+      background: #fef9ef;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    .calendar div:hover       { background: #4e9a52; color: #fff; }
+    .calendar .today          { border: 2px solid #38a169; }
+    .calendar .other-month    { opacity: .45; }
+
+    /* ------------ task panel ------------ */
+    .task-display {
+      background: #cdfecf;
+      padding: 1rem;
+      border-radius: 10px;
+    }
+    .task-display h2 { margin: 0 0 .6rem; font-size: 1.1rem; }
+    .task-display ul { margin: 0; padding-left: 1.2rem; }
+    .task-display li { margin-bottom: .35rem; }
+
+    footer { text-align: center; }
+    footer a { color: #008c5f; font-weight: 600; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    
+    body.dark {
+  background: linear-gradient(to right, #2d2d2d, #434343);
+  color: #e3ffe5;
+}
+
+/* Container Background */
+body.dark .container {
+  background-color: #2b2b2b;
+  color: #e3ffe5;
+  border: 1px solid #444;
+  box-shadow: 0 0 12px rgba(144, 238, 144, 0.15);
+}
+
+/* Header Text */
+body.dark header h1 {
+  color: #b4ffb4;
+}
+
+/* Calendar Cell */
+body.dark .calendar div {
+  background-color: #3a3a3a;
+  color: #e3ffe5;
+  border: 1px solid #555;
+}
+
+body.dark .calendar div:hover {
+  background-color: #009944;
+  color: #fff;
+}
+
+body.dark .calendar .today {
+  border: 2px solid #90ee90;
+}
+
+body.dark .calendar .other-month {
+  opacity: 0.4;
+}
+
+/* Task Display Box */
+body.dark .task-display {
+  background-color: #364d36;
+  color: #e3ffe5;
+  border: 1px solid #555;
+}
+
+/* Task Title & List */
+body.dark .task-display h2 {
+  color: #90ee90;
+}
+
+body.dark .task-display li {
+  color: #e3ffe5;
+}
+
+/* Footer Links */
+body.dark footer a {
+  color: #90ee90;
+}
+
+body.dark footer a:hover {
+  text-decoration: underline;
+}
+
+  </style>
+</head>
+<body>
+
+<script>
+  // Apply saved theme and font size on every page
+  document.addEventListener("DOMContentLoaded", () => {
+    const savedTheme = localStorage.getItem("theme");
+    const savedFontSize = localStorage.getItem("fontSize");
+
+    if (savedTheme === "dark") {
+      document.body.classList.add("dark");
+    }
+
+    if (savedFontSize) {
+      document.body.style.fontSize =
+        savedFontSize === "small" ? "14px" :
+        savedFontSize === "large" ? "18px" :
+        "16px";
+    }
+  });
+</script>
+
+  <div class="container">
+    <header>
+      <h1>Task Calendar</h1>
+    </header>
+
+    <!-- month controls -->
+    <div class="controls">
+      <button onclick="changeMonth(-1)">⬅️</button>
+      <span id="monthYear"></span>
+      <button onclick="changeMonth(1)">➡️</button>
+    </div>
+
+    <!-- calendar grid -->
+    <div id="calendar" class="calendar"></div>
+
+    <!-- task list -->
+    <div id="taskDisplay" class="task-display"></div>
+
+    <footer class="footer">
+      <a href="home.html">← Back to Home</a>
+    </footer>
+  </div>
+
+  <script>
+    // Simple API methods
+    async function get(resource) {
+      const res = await fetch(`/api/${resource}`);
+      return await res.json();
+    }
+
+    async function post(resource, data) {
+      const res = await fetch(`/api/${resource}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      return await res.json();
+    }
+
+    async function del(resource, id) {
+      await fetch(`/api/${resource}/${id}`, { method: "DELETE" });
+    }
+
+    // DOM references
+    const calGrid     = document.getElementById("calendar");
+    const monthYearEl = document.getElementById("monthYear");
+    const taskPanel   = document.getElementById("taskDisplay");
+
+    // App state
+    let events   = [];
+    let curDate  = new Date();
+    let selected = null;
+
+    const fmtDate = d => d.toISOString().split("T")[0];
+
+    function buildCalendar() {
+      monthYearEl.textContent = curDate.toLocaleString("default", {
+        month: "long", year: "numeric"
+      });
+
+      calGrid.innerHTML = "";
+
+      const firstOfMonth = new Date(curDate.getFullYear(), curDate.getMonth(), 1);
+      const start = new Date(firstOfMonth);
+      start.setDate(start.getDate() - start.getDay());
+
+      for (let i = 0; i < 42; i++) {
+        const cellDate = new Date(start);
+        cellDate.setDate(start.getDate() + i);
+        const dateStr  = fmtDate(cellDate);
+        const inMonth  = cellDate.getMonth() === curDate.getMonth();
+        const isToday  = dateStr === fmtDate(new Date());
+
+        const div = document.createElement("div");
+        div.textContent = cellDate.getDate();
+        if (!inMonth) div.classList.add("other-month");
+        if (isToday)  div.classList.add("today");
+        div.dataset.date = dateStr;
+        div.onclick = () => selectDate(dateStr);
+        calGrid.appendChild(div);
+      }
+    }
+
+    function selectDate(dateStr) {
+      selected = dateStr;
+      const dayEvents = events.filter(e => e.date === dateStr);
+
+      if (dayEvents.length === 0) {
+        taskPanel.innerHTML =
+          `<h2>${dateStr}</h2><p>No tasks for this day.</p>`;
+        return;
+      }
+
+      taskPanel.innerHTML =
+        `<h2>${dateStr}</h2><ul>` +
+        dayEvents
+          .map(
+            e => `<li>
+                    <strong>${e.title}</strong>
+                    <button onclick="deleteEvent(${e.id})">❌</button>
+                  </li>`
+          )
+          .join("") +
+        `</ul>`;
+    }
+
+    function changeMonth(shift) {
+      curDate.setMonth(curDate.getMonth() + shift);
+      curDate.setDate(1);
+      buildCalendar();
+      if (selected) selectDate(selected);
+    }
+    window.changeMonth = changeMonth;
+
+    async function deleteEvent(id) {
+      await del("tasks", id); // or "events" if that's your backend path
+      events = events.filter(e => e.id !== id);
+      if (selected) selectDate(selected);
+    }
+    window.deleteEvent = deleteEvent;
+
+    // Optional: Double click to quickly add task
+    calGrid.addEventListener("dblclick", async e => {
+      const date = e.target.dataset.date;
+      if (!date) return;
+      const title = prompt("Task title?");
+      if (!title) return;
+      const newEvent = await post("tasks", {
+        title,
+        date,
+        description: "",
+        category: "General",
+        status: "PENDING"
+      });
+      events.push(newEvent);
+      selectDate(date);
+    });
+
+    async function init() {
+      try {
+        events = await get("tasks");
+      } catch {
+        events = [];
+      }
+      buildCalendar();
+    }
+    window.addEventListener("DOMContentLoaded", init);
+  </script>
+  
+  
+</body>
+</html>

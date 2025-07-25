@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Settings – DoFlow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* ---------- Base & layout ---------- */
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:'Segoe UI',sans-serif;
+      background:linear-gradient(to right,#d0ffdf,#baffd0);
+      transition:background .5s ease,color .4s;
+      color:#333;
+    }
+    .settings-container{
+      max-width:400px;margin:30px auto;
+      background:#ecfeed;padding:20px;border-radius:16px;
+      box-shadow:0 6px 16px rgba(0,0,0,.15);
+      animation:fadeIn .6s ease-in-out;
+    }
+    .title{text-align:center;font-size:26px;margin-bottom:25px;color:#025e47}
+    .setting-section{margin-bottom:25px}
+    .setting-section h2{
+      margin-bottom:10px;font-size:18px;color:#048c6c;
+      border-bottom:2px solid #aaffcc;padding-bottom:5px
+    }
+    .setting-item{
+      display:flex;justify-content:space-between;align-items:center;
+      margin:12px 0;font-size:15px;animation:slideIn .4s ease
+    }
+    .setting-item select{
+      padding:5px;border-radius:5px;border:1px solid #ccc
+    }
+    input[type="checkbox"]{transform:scale(1.2);cursor:pointer}
+    .footer{text-align:center;margin-top:25px}
+    .footer a{color:#008c5f;text-decoration:none;font-weight:600}
+    .footer a:hover{text-decoration:underline}
+
+    /* ---------- Dark Mode ---------- */
+    body.dark{
+      background:linear-gradient(to right,#2d2d2d,#434343);
+      color:#e3ffe5;
+    }
+    body.dark .settings-container{background:#2f2f2f;color:#e3ffe5}
+    body.dark .setting-section h2{color:#7bffc9;border-color:#55d9a8}
+    body.dark .footer a{color:#9dffc2}
+
+    /* ---------- Animations ---------- */
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1}}
+    @keyframes slideIn{from{opacity:0;transform:translateX(-15px)}to{opacity:1}}
+
+    /* ---------- Responsive ---------- */
+    @media(max-width:600px){
+      .settings-container{margin:15px;padding:15px;max-width:95%}
+      .title{font-size:22px}
+      .setting-item{flex-direction:column;align-items:flex-start;gap:10px;font-size:14px}
+      .setting-item select{width:100%}
+    }
+  </style>
+</head>
+<body>
+  <div class="settings-container">
+    <h1 class="title">⚙️ App Settings</h1>
+
+    <!-- Appearance -->
+    <div class="setting-section">
+      <h2>🌈 Appearance</h2>
+      <div class="setting-item">
+        <label for="darkMode">🌙 Enable Dark Mode</label>
+        <input type="checkbox" id="darkMode">
+      </div>
+      <div class="setting-item">
+        <label for="fontSize">🔠 Font Size</label>
+        <select id="fontSize">
+          <option value="small">Small</option>
+          <option value="medium" selected>Medium</option>
+          <option value="large">Large</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="setting-section">
+      <h2>🔔 Notifications</h2>
+      <div class="setting-item">
+        <label for="emailNotif">📧 Email Notifications</label>
+        <input type="checkbox" id="emailNotif">
+      </div>
+      <div class="setting-item">
+        <label for="taskReminder">⏰ Task Reminders</label>
+        <input type="checkbox" id="taskReminder">
+      </div>
+    </div>
+
+    <!-- Productivity -->
+    <div class="setting-section">
+      <h2>🧠 Productivity</h2>
+      <div class="setting-item">
+        <label for="autoSave">💾 Auto Save Tasks</label>
+        <input type="checkbox" id="autoSave">
+      </div>
+      <div class="setting-item">
+        <label for="focusMode">🧘 Focus Mode</label>
+        <input type="checkbox" id="focusMode">
+      </div>
+    </div>
+
+    <div class="footer">
+      <a href="home.html">← Back to Home</a>
+    </div>
+  </div>
+
+  <script>
+  const darkModeCheckbox = document.getElementById("darkMode");
+  const fontSizeSelect = document.getElementById("fontSize");
+
+  // Load saved preferences
+  document.addEventListener("DOMContentLoaded", () => {
+    const savedTheme = localStorage.getItem("theme");
+    const savedFontSize = localStorage.getItem("fontSize");
+
+    if (savedTheme === "dark") {
+      document.body.classList.add("dark");
+      darkModeCheckbox.checked = true;
+    }
+
+    if (savedFontSize) {
+      fontSizeSelect.value = savedFontSize;
+      document.body.style.fontSize =
+        savedFontSize === "small" ? "14px" :
+        savedFontSize === "large" ? "18px" :
+        "16px"; // medium default
+    }
+  });
+
+  // Handle theme toggle
+  darkModeCheckbox.addEventListener("change", () => {
+    if (darkModeCheckbox.checked) {
+      localStorage.setItem("theme", "dark");
+    } else {
+      localStorage.setItem("theme", "light");
+    }
+    // Apply immediately
+    document.body.classList.toggle("dark");
+  });
+
+  // Handle font size change
+  fontSizeSelect.addEventListener("change", () => {
+    const selectedSize = fontSizeSelect.value;
+    localStorage.setItem("fontSize", selectedSize);
+    // Apply immediately
+    document.body.style.fontSize =
+      selectedSize === "small" ? "14px" :
+      selectedSize === "large" ? "18px" :
+      "16px";
+  });
+</script>
+
+  
+  
+</body>
+</html>

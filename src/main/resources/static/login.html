@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title>DoFlow – Login</title>
+
+  <style>
+    :root {
+      --brand:        #9cf0a0;
+      --brand-dark:   #4e9a52;
+      --bg-light:     #ebfcee;
+      --bg-dark:      #2b2b2b;
+      --text-light:   #155724;
+      --text-dark:    #333;
+    }
+
+    /* ---------- layout ---------- */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url("./mint-design-3.jpg") center/cover no-repeat;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .logo-link {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
+    .mini-logo { height: 40px; cursor: pointer; }
+
+    .login-container {
+      background: var(--bg-light);
+      padding: 50px;
+      border-radius: 15px;
+      box-shadow: 0 8px 16px rgba(0,0,0,.2);
+      width: 300px;
+      text-align: center;
+    }
+    h2 { margin-bottom: 20px; }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      width: 80%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: var(--brand);
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover { background: var(--brand-dark); }
+
+    @media (max-width: 400px) {
+      .login-container { width: 90%; padding: 25px; }
+      input, button    { font-size: 14px; padding: 10px; }
+    }
+
+    /* ---------- popup ---------- */
+    #popup {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #d4edda;
+      color: var(--text-light);
+      padding: 15px 25px;
+      border-radius: 8px;
+      box-shadow: 0 5px 10px rgba(0,0,0,.2);
+      display: none;
+      z-index: 1000;
+      font-weight: 600;
+    }
+
+    /* ---------- dark mode ---------- */
+    body.dark { background: #1e1e1e; color: #eaffea; }
+    body.dark .login-container { background: var(--bg-dark); }
+    body.dark input { background: #3a3a3a; color: #eaffea; border: 1px solid #555; }
+    body.dark button { background: #00b34d; color: #fff; }
+    body.dark button:hover { background: #009944; }
+  </style>
+</head>
+
+<body>
+  <a href="home.html" class="logo-link"><img src="images/logo.jpg" alt="DoFlow logo" class="mini-logo"></a>
+
+  <div id="popup"></div>
+
+  <div class="login-container">
+    <h2>Login</h2>
+    <form id="loginForm" autocomplete="on">
+  <input id="liEmail" type="email" autocomplete="email" placeholder="Email" aria-label="Email" required />
+  <input id="liPass" type="password" autocomplete="current-password" placeholder="Password" aria-label="Password" required />
+  <button type="submit">Login</button>
+</form>
+  </div>
+
+  <script>
+  const API = "http://localhost:8080/api";
+  const popup = document.getElementById("popup");
+
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("liEmail").value.trim();
+    const password = document.getElementById("liPass").value.trim();
+
+    try {
+      const res = await fetch(`${API}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) return showPopup(data.message || "Login failed", true);
+
+      localStorage.setItem("userId",       data.id ?? "");
+      localStorage.setItem("name",         data.username ?? "");
+      localStorage.setItem("profileImage", data.profilePictureUrl || "images/default-profile.jpg");
+      localStorage.setItem("createdOn",    data.createdOn ?? "");
+      localStorage.setItem("lastLogin",    data.lastLogin ?? "");
+
+      showPopup("✅ Login successful");
+      setTimeout(() => location.href = "home.html", 1000);
+    } catch (err) {
+      console.error(err);
+      showPopup("Network / server error", true);
+    }
+  });
+
+  function showPopup(msg, isErr = false) {
+    popup.textContent = msg;
+    popup.style.background = isErr ? "#f8d7da" : "#d4edda";
+    popup.style.color      = isErr ? "#721c24" : "#155724";
+    popup.style.display    = "block";
+    setTimeout(() => popup.style.display = "none", 2200);
+  }
+
+  if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark");
+  }
+</script>
+
+</body>
+</html>

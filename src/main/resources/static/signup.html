@@ -1,0 +1,171 @@
+<!-- ✅ Fixed signuppage.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Create Account – DoFlow</title>
+<style>
+body {
+	margin: 0;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	background: #f5fff6;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 100vh;
+}
+
+.card {
+	background: #fff;
+	border-radius: 8px;
+	padding: 30px 40px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, .1);
+	width: 100%;
+	max-width: 420px;
+}
+
+h1 {
+	margin: 0 0 24px;
+	font-size: 26px;
+	color: #2b7a2b;
+	text-align: center;
+}
+
+label {
+	display: block;
+	margin: 12px 0 6px;
+	font-weight: 600;
+	color: #333;
+}
+
+input {
+	width: 100%;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 6px;
+}
+
+button {
+	width: 100%;
+	margin-top: 24px;
+	padding: 12px;
+	border: none;
+	border-radius: 6px;
+	background: #4e9a52;
+	color: #fff;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background .3s;
+}
+
+button:hover {
+	background: #3d7d41;
+}
+
+.link {
+	margin-top: 18px;
+	text-align: center;
+	font-size: 14px;
+}
+
+.link a {
+	color: #2b7a2b;
+	text-decoration: none;
+	font-weight: 600;
+}
+</style>
+</head>
+<!-- ✅ Fixed signuppage.html -->
+</head>
+<body>
+  <div class="card">
+    <h1>Create Account</h1>
+    <form id="signupForm">
+      <label for="username">Username</label>
+      <input id="username" required />
+
+      <label for="email">Email</label>
+      <input id="email" type="email" required />
+
+      <label for="password">Password</label>
+      <input id="suPass" type="password" required />
+
+      <label for="confirmPass">Confirm Password</label>
+      <input id="confirmPass" type="password" required />
+
+      <label for="profilePictureUrl">Profile Picture URL (optional)</label>
+      <input id="profilePictureUrl" />
+
+      <button type="submit">Sign Up</button>
+    </form>
+    <div class="link">
+      Already registered? <a href="login.html">Log in here</a>
+    </div>
+    <div id="popup" class="popup" style="display:none;"></div>
+  </div>
+
+  <script>
+  const API = "http://localhost:8080/api";
+
+  document.getElementById("signupForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    // ✅ Get inputs correctly
+    const usernameInput = document.getElementById("username");
+    const emailInput = document.getElementById("email");
+    const passInput = document.getElementById("suPass");
+    const confirmInput = document.getElementById("confirmPass");
+    const picInput = document.getElementById("profilePictureUrl");
+
+    const username = usernameInput.value.trim();
+    const email = emailInput.value.trim();
+    const password = passInput.value.trim();
+    const confirm = confirmInput.value.trim();
+    const picUrl = picInput.value.trim();
+
+    if (password !== confirm) return showPopup("❌ Passwords do not match", true);
+
+    try {
+      const res = await fetch(`${API}/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username,
+          email,
+          password,
+          profilePictureUrl: picUrl || null
+        })
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) return showPopup(data.message || "Signup failed", true);
+
+      // ✅ Save to localStorage
+      if (data.id) localStorage.setItem("userId", data.id);
+      localStorage.setItem("name", username);
+      if (picUrl) localStorage.setItem("profileImage", picUrl);
+
+      showPopup("✅ Account created!");
+      setTimeout(() => location.href = "home.html", 1500);
+
+    } catch (err) {
+      console.error(err);
+      showPopup("Server error. Try again later.", true);
+    }
+  });
+
+  function showPopup(msg, isError = false) {
+    const pop = document.getElementById("popup");
+    pop.textContent = msg;
+    pop.style.display = "block";
+    pop.style.backgroundColor = isError ? "#f8d7da" : "#d4edda";
+    pop.style.color = isError ? "#721c24" : "#155724";
+    setTimeout(() => pop.style.display = "none", 2500);
+  }
+</script>
+
+
+</body>
+</html>

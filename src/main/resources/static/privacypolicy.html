@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Privacy Policy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #eaffea;
+      color: #333;
+      padding: 0 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Logo link */
+    .logo-link {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      display: inline-block;
+    }
+
+    .mini-logo {
+      height: 40px;
+      cursor: pointer;
+    }
+
+    .privacy-container {
+      max-width: 900px;
+      margin: 80px auto 40px;
+      background: #fff;
+      padding: 40px 50px;
+      border-radius: 15px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .privacy-container h1 {
+      text-align: center;
+      color: #2b6e2f;
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+
+    .privacy-container h2 {
+      color: #4eb44e;
+      font-size: 1.3em;
+      margin-top: 25px;
+    }
+
+    .privacy-container p {
+      font-size: 1.05em;
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+
+    .back-btn-container {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    #backBtn {
+      background: transparent;
+      color: #2b6e2f;
+      border: 2px solid #2b6e2f;
+      padding: 10px 20px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    #backBtn:hover {
+      background-color: #2b6e2f;
+      color: white;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .privacy-container {
+        padding: 25px;
+      }
+
+      .privacy-container h1 {
+        font-size: 1.6em;
+      }
+
+      .privacy-container h2 {
+        font-size: 1.15em;
+      }
+
+      .privacy-container p {
+        font-size: 0.95em;
+      }
+    }
+
+    /* Dark mode styles */
+    body.dark {
+      background-color: #244d3b;
+      color: #eaffea;
+    }
+
+    body.dark .privacy-container {
+      background-color: #3b6f5a;
+      color: #eaffea;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      border: 1px solid #4aa382;
+    }
+
+    body.dark .privacy-container h1,
+    body.dark .privacy-container h2 {
+      color: #b9f7d2;
+    }
+
+    body.dark #backBtn {
+      color: #b9f7d2;
+      border-color: #b9f7d2;
+    }
+
+    body.dark #backBtn:hover {
+      background-color: #b9f7d2;
+      color: #2c2c2c;
+    }
+  </style>
+</head>
+<body>
+
+<script>
+  // Apply saved theme and font size on every page
+  document.addEventListener("DOMContentLoaded", () => {
+    const savedTheme = localStorage.getItem("theme");
+    const savedFontSize = localStorage.getItem("fontSize");
+
+    if (savedTheme === "dark") {
+      document.body.classList.add("dark");
+    }
+
+    if (savedFontSize) {
+      document.body.style.fontSize =
+        savedFontSize === "small" ? "14px" :
+        savedFontSize === "large" ? "18px" :
+        "16px";
+    }
+  });
+</script>
+
+<!-- Logo Navigation -->
+<a href="home.html" class="logo-link">
+  <img src="images/logo.jpg" alt="Logo" class="mini-logo" />
+</a>
+
+<!-- Privacy Policy Content -->
+<div class="privacy-container">
+  <h1>Privacy Policy</h1>
+
+  <p>We value your privacy and are committed to protecting your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our website.</p>
+
+  <h2>1. Information We Collect</h2>
+  <p>We may collect personal details like your name, email address, or preferences when you fill out forms or use features on our site. We also gather general usage data to improve our services.</p>
+
+  <h2>2. How We Use Your Information</h2>
+  <p>We use the collected data to personalize your experience, improve our website, respond to your queries, and ensure smooth functionality.</p>
+
+  <h2>3. Data Protection</h2>
+  <p>Your data is stored securely, and we take appropriate technical measures to protect it from unauthorized access or misuse.</p>
+
+  <h2>4. Cookies</h2>
+  <p>We use cookies to analyze website traffic and enhance your browsing experience. You can manage cookie settings in your browser.</p>
+
+  <h2>5. Third-party Sharing</h2>
+  <p>We do not sell, trade, or share your personal data with external parties without your consent, except to comply with legal obligations.</p>
+
+  <h2>6. Your Consent</h2>
+  <p>By using our website, you agree to the terms of this privacy policy.</p>
+
+  <h2>7. Changes to This Policy</h2>
+  <p>We may update this policy occasionally. Any changes will be reflected on this page with the updated date.</p>
+
+  <p><strong>Last updated:</strong> June 13, 2025</p>
+</div>
+
+<div class="back-btn-container">
+  <button id="backBtn">⬅ Back to Homepage</button>
+</div>
+
+<script>
+  document.getElementById("backBtn").addEventListener("click", () => {
+    window.location.href = "Homepage.html";
+  });
+</script>
+
+</body>
+</html>
